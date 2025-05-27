@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"strings"
+	"time"
 
 	"os"
 
@@ -19,8 +20,9 @@ type cliCommand struct {
 }
 
 type config struct {
-	prev string
-	next string
+	pokeapiClient   pokeapi.Client
+	nextLocationUrl *string
+	prevLocationUrl *string
 }
 
 func cleanInput(text string) []string {
@@ -33,43 +35,11 @@ func cleanInput(text string) []string {
 	return words
 }
 
-func commandExit(config *config) error {
-	fmt.Print("Closing the Pokedex... Goodbye!\n")
-	os.Exit(0)
-
-	return nil
-}
-
-func commandHelp(config *config) error {
-	fmt.Print("Welcome to the Pokedex!\n")
-	fmt.Print("Usage:\n\n")
-
-	for commandName, command := range commands {
-		fmt.Printf("%s: %s\n", commandName, command.description)
-	}
-
-	return nil
-}
-
-func commandMap(config *config) error {
-	prev, next := pokeapi.GetLocationAreas(config.next)
-	config.prev = prev
-	config.next = next
-	return nil
-}
-
-func commandMapBack(config *config) error {
-	if config.prev == "" {
-		fmt.Printf("you're on the first page\n")
-		return nil
-	}
-	prev, next := pokeapi.GetLocationAreas(config.prev)
-	config.prev = prev
-	config.next = next
-	return nil
-}
-
 func main() {
+	pokeClient := pokeapi.NewClient(5 * time.Second)
+	config := &config{
+		pokeapiClient: pokeClient,
+	}
 	commands = map[string]cliCommand{
 		"help": {
 			name:        "help",
@@ -94,7 +64,6 @@ func main() {
 	}
 	reader := os.Stdin
 	scanner := bufio.NewScanner(reader)
-	config := config{}
 
 	for {
 		fmt.Print("Pokedex > ")
@@ -103,7 +72,11 @@ func main() {
 			inputWords := cleanInput(userInput)
 			if len(inputWords) > 0 {
 				if cmd, ok := commands[inputWords[0]]; ok {
-					cmd.callback(&config)
+					err := cmd.callback(config)
+					if err != nil {
+						fmt.Println(err)
+					}
+					continue
 				} else {
 					fmt.Printf("Unknown command: %s\n", inputWords[0])
 				}
