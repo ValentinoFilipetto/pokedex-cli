@@ -20,7 +20,7 @@ type cliCommand struct {
 }
 
 type config struct {
-	pokeapiClient   pokeapi.Client
+	pokeapiClient   *pokeapi.Client
 	nextLocationUrl *string
 	prevLocationUrl *string
 }
@@ -38,7 +38,7 @@ func cleanInput(text string) []string {
 func main() {
 	pokeClient := pokeapi.NewClient(5 * time.Second)
 	config := &config{
-		pokeapiClient: pokeClient,
+		pokeapiClient: &pokeClient,
 	}
 	commands = map[string]cliCommand{
 		"help": {

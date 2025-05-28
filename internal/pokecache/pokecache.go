@@ -17,10 +17,12 @@ type Cache struct {
 }
 
 func NewCache(interval time.Duration) *Cache {
-	return &Cache{
+	cache :=  &Cache{
 		items:    make(map[string]cacheEntry),
 		interval: interval,
 	}
+	cache.reapLoop()
+	return cache
 }
 
 func (c *Cache) Add(key string, val []byte) {
@@ -29,14 +31,38 @@ func (c *Cache) Add(key string, val []byte) {
 		val:       val,
 	}
 
+	c.mu.Lock()
 	c.items[key] = entry
+	c.mu.Unlock()
 }
 
 func (c *Cache) Get(key string) ([]byte, bool) {
 	value, ok := c.items[key]
+
+	c.mu.Lock()
 	if ok {
 		return value.val, true
 	}
+	c.mu.Unlock()
 
 	return nil, false
+}
+
+// Each time c.Interval passes we should remove entries that are older than c.Interval
+// This ensures that the cache does not grow too large over time.
+func (c *Cache) reapLoop() {
+	go func() {
+		ticker := time.NewTicker(c.interval)
+		for {
+			<-ticker.C
+			c.mu.Lock()
+			now := time.Now()
+			for key, item := range c.items {
+				if item.createdAt.Add(c.interval).Before(now) {
+					delete(c.items, key)
+				}
+			}
+			c.mu.Unlock()
+		}
+	}()
 }
