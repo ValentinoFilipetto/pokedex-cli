@@ -5,7 +5,7 @@ import (
 )
 
 // commandMap retrieves and displays the next 20 location areas from the PokeAPI.
-func commandMap(config *config) error {
+func commandMap(config *config, args []string) error {
 	locations, err := config.pokeapiClient.GetLocationAreas(config.nextLocationUrl)
 	if err != nil {
 		return err
@@ -21,7 +21,7 @@ func commandMap(config *config) error {
 }
 
 // commandMapBack retrieves and displays the previous 20 location areas from the PokeAPI.
-func commandMapBack(config *config) error {
+func commandMapBack(config *config, args []string) error {
 	if config.prevLocationUrl == nil {
 		fmt.Printf("you're on the first page\n")
 		return nil

@@ -16,7 +16,7 @@ var commands map[string]cliCommand
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, []string) error
 }
 
 type config struct {
@@ -61,6 +61,11 @@ func main() {
 			description: "Displays the previous 20 locations",
 			callback:    commandMapBack,
 		},
+		"explore": {
+			name: "explore",
+			description: "Shows pokemon in a specific location",
+			callback: commandExplore,
+		},
 	}
 	reader := os.Stdin
 	scanner := bufio.NewScanner(reader)
@@ -72,7 +77,7 @@ func main() {
 			inputWords := cleanInput(userInput)
 			if len(inputWords) > 0 {
 				if cmd, ok := commands[inputWords[0]]; ok {
-					err := cmd.callback(config)
+					err := cmd.callback(config, inputWords[1:])
 					if err != nil {
 						fmt.Println(err)
 					}
