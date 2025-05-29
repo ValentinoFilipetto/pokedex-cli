@@ -26,7 +26,6 @@ func (c *Client) GetLocationAreas(pageURL *string) (RespLocations, error) {
 		return locationAreas, nil
 	}
 
-
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return RespLocations{}, err

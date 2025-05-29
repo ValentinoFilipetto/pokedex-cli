@@ -10,7 +10,7 @@ func (c *Client) GetPokemonByLocation(location string) (Encounters, error) {
 	url := baseURL + "/location-area/" + location
 	encounters := Encounters{}
 
-    // check if we already fetched encounters for that url
+	// check if we already fetched encounters for that url
 	// if so, return encounters from the cache
 	items, ok := c.cache.Get(url)
 
@@ -21,7 +21,6 @@ func (c *Client) GetPokemonByLocation(location string) (Encounters, error) {
 		}
 		return encounters, nil
 	}
-
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

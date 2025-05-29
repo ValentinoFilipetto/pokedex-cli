@@ -9,7 +9,7 @@ import (
 
 type Client struct {
 	httpClient http.Client
-	cache pokecache.Cache
+	cache      pokecache.Cache
 }
 
 func NewClient(timeout time.Duration) Client {
@@ -20,4 +20,3 @@ func NewClient(timeout time.Duration) Client {
 		cache: *pokecache.NewCache(timeout),
 	}
 }
-
