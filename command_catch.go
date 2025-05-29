@@ -1,8 +1,9 @@
 package main
 
 import (
+	"crypto/rand"
 	"fmt"
-	"math/rand/v2"
+	"math/big"
 )
 
 func commandCatch(config *config, args []string) error {
@@ -20,7 +21,12 @@ func commandCatch(config *config, args []string) error {
 
 	// the higher the Pokemon's base experience, the harder it is to catch it.
 	threshold := 50
-	random_number := rand.IntN(pokemon.BaseExperience + 1)
+	max := big.NewInt(int64(pokemon.BaseExperience + 1))
+	randomBigInt, err := rand.Int(rand.Reader, max)
+	if err != nil {
+		return fmt.Errorf("error generating random number: %w", err)
+	}
+	random_number := int(randomBigInt.Int64()) // Convert *big.Int to int
 	if random_number < threshold {
 		fmt.Printf("%s was caught!\n", args[0])
 		caughtPokemon := pokemon
