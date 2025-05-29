@@ -14,12 +14,19 @@ import (
 var commands map[string]cliCommand
 
 type Pokemon struct {
-	ID      int    `json:"id"`
-	Name    string `json:"name"`
-	Species struct {
-		Name string `json:"name"`
-		URL  string `json:"url"`
-	} `json:"species"`
+	Height int      `json:"Height"`
+	Weight int      `json:"Weight"`
+	Stats  []Stat   `json:"Stats"`
+	Types  []string `json:"Types"`
+}
+
+type Stat struct {
+	HP             int `json:"hp"`
+	Attack         int `json:"attack"`
+	Defense        int `json:"defense"`
+	SpecialAttack  int `json:"special-attack"`
+	SpecialDefense int `json:"special-defense"`
+	Speed          int `json:"speed"`
 }
 
 type cliCommand struct {
@@ -32,7 +39,7 @@ type config struct {
 	pokeapiClient   *pokeapi.Client
 	nextLocationUrl *string
 	prevLocationUrl *string
-	pokedex map[string]Pokemon
+	pokedex         map[string]pokeapi.PokemonResponse
 }
 
 func cleanInput(text string) []string {
@@ -49,7 +56,7 @@ func main() {
 	pokeClient := pokeapi.NewClient(30 * time.Second)
 	config := &config{
 		pokeapiClient: &pokeClient,
-		pokedex: make(map[string]Pokemon),
+		pokedex:       make(map[string]pokeapi.PokemonResponse),
 	}
 	commands = map[string]cliCommand{
 		"help": {
@@ -73,14 +80,19 @@ func main() {
 			callback:    commandMapBack,
 		},
 		"explore": {
-			name: "explore",
+			name:        "explore",
 			description: "Shows pokemon in a specific location",
-			callback: commandExplore,
+			callback:    commandExplore,
 		},
 		"catch": {
-			name: "catch",
+			name:        "catch",
 			description: "Try and catch Pokemon",
-			callback: commandCatch,
+			callback:    commandCatch,
+		},
+		"inspect": {
+			name:        "inspect",
+			description: "Inspect a Pokemon the user has caught",
+			callback:    commandInspect,
 		},
 	}
 	reader := os.Stdin

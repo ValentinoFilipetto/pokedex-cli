@@ -20,19 +20,15 @@ func commandCatch(config *config, args []string) error {
 
 	// the higher the Pokemon's base experience, the harder it is to catch it.
 	threshold := 50
-    random_number := rand.IntN(pokemon.BaseExperience + 1)
+	random_number := rand.IntN(pokemon.BaseExperience + 1)
 	if random_number < threshold {
 		fmt.Printf("%s was caught!\n", args[0])
-		caughtPokemon := Pokemon{
-			ID:     pokemon.ID,
-			Name:   pokemon.Name,
-			Species: pokemon.Species,
-		}
+		caughtPokemon := pokemon
 
 		config.pokedex[pokemon.Name] = caughtPokemon
 		return nil
 	}
 
-    fmt.Printf("%s escaped!\n", args[0])
+	fmt.Printf("%s escaped!\n", args[0])
 	return nil
 }
