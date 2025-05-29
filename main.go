@@ -13,6 +13,15 @@ import (
 
 var commands map[string]cliCommand
 
+type Pokemon struct {
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
+	Species struct {
+		Name string `json:"name"`
+		URL  string `json:"url"`
+	} `json:"species"`
+}
+
 type cliCommand struct {
 	name        string
 	description string
@@ -23,6 +32,7 @@ type config struct {
 	pokeapiClient   *pokeapi.Client
 	nextLocationUrl *string
 	prevLocationUrl *string
+	pokedex map[string]Pokemon
 }
 
 func cleanInput(text string) []string {
@@ -39,6 +49,7 @@ func main() {
 	pokeClient := pokeapi.NewClient(30 * time.Second)
 	config := &config{
 		pokeapiClient: &pokeClient,
+		pokedex: make(map[string]Pokemon),
 	}
 	commands = map[string]cliCommand{
 		"help": {
@@ -65,6 +76,11 @@ func main() {
 			name: "explore",
 			description: "Shows pokemon in a specific location",
 			callback: commandExplore,
+		},
+		"catch": {
+			name: "catch",
+			description: "Try and catch Pokemon",
+			callback: commandCatch,
 		},
 	}
 	reader := os.Stdin
