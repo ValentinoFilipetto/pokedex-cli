@@ -2,22 +2,60 @@
 
 # pokedex-cli
 
-A small interactive REPL-style Pokedex CLI built in Go. It queries the public **PokeAPI** and lets you:
+A REPL-style Pokedex CLI written in Go. It uses the public **PokeAPI** to:
 - page through location areas (`map`, `mapb`)
-- explore a location area to list Pokémon encounters (`explore <location>`)
-- try to catch a Pokémon (`catch <pokemon>`)
-- inspect caught Pokémon (`inspect <pokemon>`)
+- explore a location area (`explore <location-area>`)
+- catch Pokémon (`catch <pokemon-name>`)
+- inspect caught Pokémon (`inspect <pokemon-name>`)
 - list your caught Pokémon (`pokedex`)
 
-The client includes a lightweight in-memory cache to avoid re-fetching responses repeatedly.
+To reduce repeated API calls, some endpoints are cached in memory with a TTL.
 
 ## Requirements
 
-- Go installed (the module declares `go 1.23.0`)
+- Go installed
 
-## Install dependencies
-
-From the repo root:
+## Install
 
 ```bash
 go mod download
+```
+
+## Run
+
+```bash
+go run .
+```
+
+Then type `help` to see commands.
+
+## Commands (overview)
+
+- `help` — show available commands and descriptions
+- `map` — list the next page of location areas
+- `mapb` — list the previous page of location areas
+- `explore <location-area>` — list Pokémon found in a given location area  
+  Example:
+  ```bash
+  explore canalave-city-area
+  ```
+- `catch <pokemon-name>` — attempt to catch a Pokémon (random chance based on base XP)  
+  Example:
+  ```bash
+  catch pikachu
+  ```
+- `inspect <pokemon-name>` — show details of a caught Pokémon
+- `pokedex` — list caught Pokémon in the current session
+- `exit` — quit
+
+## Tests
+
+```bash
+go test ./...
+```
+
+## Implementation notes
+
+- `internal/pokeapi` wraps HTTP calls to PokeAPI.
+- `internal/pokecache` is a small TTL cache with a reap loop.
+- The Pokedex is stored in memory (no persistence between runs).
